@@ -7,7 +7,6 @@ package com.demo.mlc.controller.impl;
 
 import com.demo.mlc.dto.UserLoginResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,16 +36,17 @@ public class UserControllerImpl implements UserController{
     public ResponseEntity<Object> createUser(@RequestBody UsuarioAccesoEntity user) {
         try {
             UsuarioAccesoEntity userNew = userService.createUser(user);
-            return ResponseEntity.status(HttpStatus.OK).body(user);
+            return ResponseEntity.status(HttpStatus.OK).body(userNew);
         } catch (ServiceException e) {
             return new ResponseEntity<>(e.getCode(), e.getCode().getHttpStatus());
         }
     }
 
-    @Override
-    @GetMapping("/user/login")
+    @Override    
+    @PostMapping("/user/login")
     public ResponseEntity<Object> validateUser(@RequestBody UsuarioAccesoEntity user) {
         try{
+            log.info("Entro a validar usuario" + user);
          UserLoginResponse userLoginResponse = userService.validateUser(user);
         return ResponseEntity.status(HttpStatus.OK).body(userLoginResponse);
         }catch(ServiceException e){
