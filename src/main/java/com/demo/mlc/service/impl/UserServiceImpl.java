@@ -35,13 +35,9 @@ public class UserServiceImpl implements UserService {
             Optional<UsuarioAccesoEntity> opUsuario = userRepository.findByCorreo(user.getCorreo());
 
             if (opUsuario.isPresent()) {
-                UsuarioAccesoEntity opUser = opUsuario.get();
-
-                if (opUser != null && opUser.getCorreo().equalsIgnoreCase(user.getCorreo())) {
-                    ErrorCode errorCode = new ErrorCode();
-                    errorCode.setMessage("User exists");
-                    throw new ServiceException(errorCode);
-                }
+                ErrorCode errorCode = new ErrorCode();
+                errorCode.setMessage("User exists");
+                throw new ServiceException(errorCode);
             }
             return userRepository.save(user);
         } catch (Exception e) {
@@ -54,13 +50,10 @@ public class UserServiceImpl implements UserService {
     public UserLoginResponse validateUser(UsuarioAccesoEntity user) throws ServiceException {
         try {
             Optional<UsuarioAccesoEntity> opUsuario = userRepository.findByCorreo(user.getCorreo());
-            UserLoginResponse loginResponse = new UserLoginResponse();
+            final UserLoginResponse loginResponse = new UserLoginResponse();
 
-            boolean isInValid = true;
-            if (opUsuario.isPresent()) {
-                UsuarioAccesoEntity opUser = opUsuario.get();
-
-                if (opUser != null && opUser.getCorreo().equalsIgnoreCase(user.getCorreo()) && opUser.getContrasenia().equalsIgnoreCase(user.getContrasenia())) {
+            opUsuario.ifPresent((opUser) -> {
+                if (opUser != null && opUser.getCorreo().equalsIgnoreCase(user.getCorreo()) && opUser.getContrasenia().equals(user.getContrasenia())) {
                     loginResponse.setUser(opUser.getCorreo());
 
                     //30minutos = 1_800_000 milisegundos
@@ -71,11 +64,10 @@ public class UserServiceImpl implements UserService {
                     String src = opUser.getCorreo() + timeInMillis;
                     String token = Base64.getEncoder().encodeToString(src.getBytes());
                     loginResponse.setIdToken(token);
-                    isInValid = false;
                 }
-            }
+            });
 
-            if (isInValid) {
+            if (loginResponse.getIdToken() == null) {
                 ErrorCode errorCode = new ErrorCode();
                 errorCode.setMessage("Access denied");
                 throw new ServiceException(errorCode, errorCode.getMessage());

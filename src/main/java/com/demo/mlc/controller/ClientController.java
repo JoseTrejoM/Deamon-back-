@@ -16,11 +16,11 @@ public interface ClientController {
     
     ResponseEntity<Object> createClient(ClienteEntity client);
     
-    ResponseEntity<Object> getClientById (ClienteEntity client);
+    ResponseEntity<Object> getClientById (Integer idCliente);
     
     ResponseEntity<Object> getClientAll();       
     
     ResponseEntity<Object> updateClient(ClienteEntity client);
     
-    ResponseEntity<Object> deleteClient(ClienteEntity client);
+    ResponseEntity<Object> deleteClient(Integer idCliente);
 }

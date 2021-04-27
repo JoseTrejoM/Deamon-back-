@@ -42,13 +42,9 @@ public class ClientServiceImpl implements ClientService {
     public ClienteEntity getClientById(Integer idCliente) throws ServiceException {
         try {
             Optional<ClienteEntity> opClient = clientRepository.findById(idCliente);
-            if (opClient.isPresent()) {
-                return opClient.get();
-            } else {
-                ErrorCode errorCode = new ErrorCode();
-                errorCode.setMessage("Not exists id " + idCliente);
-                throw new ServiceException(errorCode);
-            }
+            ErrorCode errorCode = new ErrorCode();
+            errorCode.setMessage("Not exists " + idCliente);
+            return opClient.orElseThrow(() -> new ServiceException(errorCode));           
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw UtilsException.createServiceException(e);
@@ -89,5 +85,5 @@ public class ClientServiceImpl implements ClientService {
         } catch (Exception e) {
             throw UtilsException.createServiceException(e);
         }
-    }    
+    }
 }

@@ -21,6 +21,7 @@ import com.demo.mlc.service.ClientService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 
 /**
  *
@@ -46,10 +47,10 @@ public class ClientControllerImpl implements ClientController {
     }
 
     @Override
-    @GetMapping("/client/byid")
-    public ResponseEntity<Object> getClientById(@RequestBody ClienteEntity client) {
+    @GetMapping("/client/byid/{idCliente}")
+    public ResponseEntity<Object> getClientById(@PathVariable Integer idCliente) {
         try {
-            ClienteEntity clientGet = clientService.getClientById(client.getIdCliente());
+            ClienteEntity clientGet = clientService.getClientById(idCliente);
             return ResponseEntity.status(HttpStatus.OK).body(clientGet);
 
         } catch (ServiceException e) {
@@ -82,10 +83,10 @@ public class ClientControllerImpl implements ClientController {
     }
 
     @Override
-    @DeleteMapping("/client/delete")
-    public ResponseEntity<Object> deleteClient(@RequestBody ClienteEntity client) {
+    @DeleteMapping("/client/delete/{idCliente}")
+    public ResponseEntity<Object> deleteClient(@PathVariable Integer idCliente) {
         try {
-            ClienteEntity clientDelete =  clientService.deleteClient(client.getIdCliente());
+            ClienteEntity clientDelete =  clientService.deleteClient(idCliente);
             return ResponseEntity.status(HttpStatus.OK).body(clientDelete);
 
         } catch (ServiceException e) {
