@@ -17,4 +17,6 @@ public interface UserController {
     ResponseEntity<Object> createUser(UsuarioAccesoEntity user);
 
     ResponseEntity<Object> validateUser(UsuarioAccesoEntity user);
+    
+    ResponseEntity<Object> getUserAll();
 }
