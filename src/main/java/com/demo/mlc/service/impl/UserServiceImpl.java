@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import com.demo.mlc.repository.UserRepository;
 import com.demo.mlc.service.UserService;
 import java.util.Base64;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -73,6 +74,16 @@ public class UserServiceImpl implements UserService {
                 throw new ServiceException(errorCode, errorCode.getMessage());
             }
             return loginResponse;
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw UtilsException.createServiceException(e);
+        }
+    }
+    
+    @Override
+    public List<UsuarioAccesoEntity> getUserAll() throws ServiceException {
+        try {
+            return userRepository.findAll();
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw UtilsException.createServiceException(e);

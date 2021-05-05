@@ -8,5 +8,14 @@
                 <goal>compile</goal>
                 <goal>spring-boot:run</goal>
             </goals>
+        </action>
+        <action>
+            <actionName>CUSTOM-packageMicroservice</actionName>
+            <displayName>packageMicroservice</displayName>
+            <goals>
+                <goal>clean</goal>
+                <goal>compile</goal>
+                <goal>package</goal>
+            </goals>
         </action>        
     </actions>

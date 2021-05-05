@@ -14,9 +14,12 @@ import com.demo.mlc.controller.UserController;
 import com.demo.mlc.entity.UsuarioAccesoEntity;
 import com.demo.mlc.exception.ServiceException;
 import com.demo.mlc.service.UserService;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
 /**
@@ -26,6 +29,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 @Slf4j
 @RestController
 @RequestMapping("/api") //esta sera la raiz de la url, es decir http://127.0.0.1:8080/api/
+@CrossOrigin
 public class UserControllerImpl implements UserController{    
     
     @Autowired
@@ -52,5 +56,17 @@ public class UserControllerImpl implements UserController{
         }catch(ServiceException e){
             return new ResponseEntity<>(e.getCode(), e.getCode().getHttpStatus());
         }
-    }    
+    }
+    
+    @Override
+    @GetMapping("/user/all")
+    public ResponseEntity<Object> getUserAll() {
+        try {
+            List<UsuarioAccesoEntity> listClient = userService.getUserAll();
+            return ResponseEntity.status(HttpStatus.OK).body(listClient);
+
+        } catch (ServiceException e) {
+            return new ResponseEntity<>(e.getCode(), e.getCode().getHttpStatus());
+        }
+    }
 }
