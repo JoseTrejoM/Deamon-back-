@@ -13,10 +13,16 @@ import org.springframework.http.ResponseEntity;
  * @author greser69
  */
 public interface UserController {
-    
-    ResponseEntity<Object> createUser(UsuarioAccesoEntity user);
 
-    ResponseEntity<Object> validateUser(UsuarioAccesoEntity user);
-    
-    ResponseEntity<Object> getUserAll();
+	ResponseEntity<Object> createUser(UsuarioAccesoEntity user);
+
+	ResponseEntity<Object> validateUser(UsuarioAccesoEntity user);
+	
+	ResponseEntity<Object> getUserById (Integer idUsuario);
+
+	ResponseEntity<Object> getUserAll();
+
+	ResponseEntity<Object> updateUser(UsuarioAccesoEntity user);
+
+	ResponseEntity<Object> deleteUser(Integer idUsuario);
 }

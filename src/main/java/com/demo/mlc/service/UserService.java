@@ -21,5 +21,11 @@ public interface UserService {
      
     UserLoginResponse validateUser(UsuarioAccesoEntity user) throws ServiceException;
     
+    UsuarioAccesoEntity getUserById(Integer idUsuario) throws ServiceException;
+    
     List<UsuarioAccesoEntity> getUserAll() throws ServiceException;
+    
+    UsuarioAccesoEntity updateUser(UsuarioAccesoEntity user) throws ServiceException;
+
+    UsuarioAccesoEntity deleteUser(Integer idUsuario) throws ServiceException;
 }
