@@ -7,6 +7,9 @@ package com.demo.mlc.exception.utils;
 
 import com.demo.mlc.dto.ErrorCode;
 import com.demo.mlc.exception.ServiceException;
+
+import org.springframework.http.HttpStatus;
+
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -21,8 +24,17 @@ public class UtilsException {
             return (ServiceException) e;
         } else {
             ErrorCode errorCode = new ErrorCode();
+            errorCode.setHttpStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             errorCode.setMessage(e.getMessage());
             return new ServiceException(errorCode);
+        }
+    }
+
+    public static void showStackTraceError(Exception e){
+        if (e instanceof ServiceException) {
+            log.error(e.getMessage());
+        } else {
+            log.error(e.getMessage(), e);
         }
     }
 }

@@ -5,30 +5,43 @@
  */
 package com.demo.mlc.service.impl;
 
+import java.util.List;
+import java.util.Optional;
+
 import com.demo.mlc.dto.ErrorCode;
+import com.demo.mlc.dto.UserLoginRequest;
 import com.demo.mlc.dto.UserLoginResponse;
 import com.demo.mlc.entity.UsuarioAccesoEntity;
 import com.demo.mlc.exception.ServiceException;
 import com.demo.mlc.exception.utils.UtilsException;
-import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import com.demo.mlc.repository.UserRepository;
+import com.demo.mlc.security.JwtService;
 import com.demo.mlc.service.UserService;
-import java.util.Base64;
-import java.util.List;
-import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.stereotype.Service;
 
 /**
  *
  * @author greser69
  */
-@Slf4j
 @Service
 public class UserServiceImpl implements UserService {
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private JwtService jwtService;
 
     @Override
     public UsuarioAccesoEntity createUser(UsuarioAccesoEntity user) throws ServiceException {
@@ -37,45 +50,41 @@ public class UserServiceImpl implements UserService {
 
             if (opUsuario.isPresent()) {
                 ErrorCode errorCode = new ErrorCode();
-                errorCode.setMessage("User exists");
-                throw new ServiceException(errorCode);
+                errorCode.setHttpStatus(HttpStatus.NOT_ACCEPTABLE);
+                errorCode.setMessage(errorCode.getHttpStatus().getReasonPhrase());
+                throw new ServiceException(errorCode, errorCode.getMessage());
             }
+            String passBCrypt = BCrypt.hashpw(user.getContrasenia(), BCrypt.gensalt());
+            user.setContrasenia(passBCrypt);
             return userRepository.save(user);
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            UtilsException.showStackTraceError(e);
             throw UtilsException.createServiceException(e);
         }
     }
 
     @Override
-    public UserLoginResponse validateUser(UsuarioAccesoEntity user) throws ServiceException {
+    public UserLoginResponse validateUser(UserLoginRequest userLogin) throws ServiceException {
         try {
-            Optional<UsuarioAccesoEntity> opUsuario = userRepository.findByCorreo(user.getCorreo());
+            Optional<UsuarioAccesoEntity> opUsuario = userRepository.findByCorreo(userLogin.getUsername());
+            ErrorCode errorCode = new ErrorCode();
+            errorCode.setHttpStatus(HttpStatus.UNAUTHORIZED);
+            errorCode.setMessage(errorCode.getHttpStatus().getReasonPhrase());
+            var opUser = opUsuario.orElseThrow(() -> new ServiceException(errorCode, errorCode.getMessage()));            
+            
             final UserLoginResponse loginResponse = new UserLoginResponse();
-
-            opUsuario.ifPresent((opUser) -> {
-                if (opUser != null && opUser.getCorreo().equalsIgnoreCase(user.getCorreo()) && opUser.getContrasenia().equals(user.getContrasenia())) {
-                    loginResponse.setUser(opUser.getCorreo());
-
-                    //30minutos = 1_800_000 milisegundos
-                    long timeSesion = 1_800_000l;
-                    long timeInMillis = System.currentTimeMillis() + timeSesion;
-                    loginResponse.setExpiresIn(timeInMillis);
-
-                    String src = opUser.getCorreo() + timeInMillis;
-                    String token = Base64.getEncoder().encodeToString(src.getBytes());
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userLogin.getUsername(), userLogin.getPassword());
+                try {
+                    authenticationManager.authenticate(authentication);
+                    String token = jwtService.createToken(new UserLoginRequest(opUser));
                     loginResponse.setIdToken(token);
+                } catch (AuthenticationException e) {
+                    throw new ServiceException(errorCode, errorCode.getMessage());
                 }
-            });
 
-            if (loginResponse.getIdToken() == null) {
-                ErrorCode errorCode = new ErrorCode();
-                errorCode.setMessage("Access denied");
-                throw new ServiceException(errorCode, errorCode.getMessage());
-            }
             return loginResponse;
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            UtilsException.showStackTraceError(e);
             throw UtilsException.createServiceException(e);
         }
     }
@@ -85,10 +94,11 @@ public class UserServiceImpl implements UserService {
     	try {
             Optional<UsuarioAccesoEntity> opUser = userRepository.findById(idUsuario);
             ErrorCode errorCode = new ErrorCode();
-            errorCode.setMessage("Not exists " + idUsuario);
-            return opUser.orElseThrow(() -> new ServiceException(errorCode));           
+            errorCode.setHttpStatus(HttpStatus.NOT_FOUND);
+            errorCode.setMessage(errorCode.getHttpStatus().getReasonPhrase());
+            return opUser.orElseThrow(() -> new ServiceException(errorCode, errorCode.getMessage()));
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            UtilsException.showStackTraceError(e);
             throw UtilsException.createServiceException(e);
         }
 	}
@@ -96,9 +106,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UsuarioAccesoEntity> getUserAll() throws ServiceException {
         try {
-            return userRepository.findAll();
+            return userRepository.findAll(Sort.by(Sort.Direction.ASC, "correo"));
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            UtilsException.showStackTraceError(e);
             throw UtilsException.createServiceException(e);
         }
     }	
@@ -107,10 +117,14 @@ public class UserServiceImpl implements UserService {
 	public UsuarioAccesoEntity updateUser(UsuarioAccesoEntity user) throws ServiceException {
 		UsuarioAccesoEntity userEntity = getUserById(user.getIdUsuario());
         try {
+            if(!userEntity.getContrasenia().equals(user.getContrasenia())){
+                String passBCrypt = BCrypt.hashpw(user.getContrasenia(), BCrypt.gensalt());
+                user.setContrasenia(passBCrypt);
+            }
             userEntity = userRepository.save(user);
             return userEntity;
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            UtilsException.showStackTraceError(e);
             throw UtilsException.createServiceException(e);
         }
 	}
@@ -122,6 +136,7 @@ public class UserServiceImpl implements UserService {
             userRepository.deleteById(idUsuario);
             return userEntity;
         } catch (Exception e) {
+            UtilsException.showStackTraceError(e);
             throw UtilsException.createServiceException(e);
         }
 	}

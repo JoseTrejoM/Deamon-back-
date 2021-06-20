@@ -5,6 +5,7 @@
  */
 package com.demo.mlc.controller;
 
+import com.demo.mlc.dto.UserLoginRequest;
 import com.demo.mlc.entity.UsuarioAccesoEntity;
 import org.springframework.http.ResponseEntity;
 
@@ -16,7 +17,7 @@ public interface UserController {
 
 	ResponseEntity<Object> createUser(UsuarioAccesoEntity user);
 
-	ResponseEntity<Object> validateUser(UsuarioAccesoEntity user);
+	ResponseEntity<Object> validateUser(UserLoginRequest userLogin);
 	
 	ResponseEntity<Object> getUserById (Integer idUsuario);
 

@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.demo.mlc.controller.ClientController;
 import com.demo.mlc.exception.ServiceException;
 import com.demo.mlc.service.ClientService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -28,7 +27,6 @@ import org.springframework.web.bind.annotation.PathVariable;
  *
  * @author greser69
  */
-@Slf4j
 @RestController
 @CrossOrigin
 @RequestMapping("/api") //esta sera la raiz de la url, es decir http://127.0.0.1:8080/api/

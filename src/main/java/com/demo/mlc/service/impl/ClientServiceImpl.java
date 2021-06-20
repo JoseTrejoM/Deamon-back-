@@ -15,13 +15,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.demo.mlc.repository.ClientRepository;
 import com.demo.mlc.service.ClientService;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  *
  * @author greser69
  */
-@Slf4j
 @Service
 public class ClientServiceImpl implements ClientService {
 
@@ -33,7 +31,7 @@ public class ClientServiceImpl implements ClientService {
         try {
             return clientRepository.save(client);
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            UtilsException.showStackTraceError(e);
             throw UtilsException.createServiceException(e);
         }
     }
@@ -43,10 +41,10 @@ public class ClientServiceImpl implements ClientService {
         try {
             Optional<ClienteEntity> opClient = clientRepository.findById(idCliente);
             ErrorCode errorCode = new ErrorCode();
-            errorCode.setMessage("Not exists " + idCliente);
-            return opClient.orElseThrow(() -> new ServiceException(errorCode));           
+            errorCode.setMessage("Not exists customer with idCliente " + idCliente);
+            return opClient.orElseThrow(() -> new ServiceException(errorCode, errorCode.getMessage()));
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            UtilsException.showStackTraceError(e);
             throw UtilsException.createServiceException(e);
         }
 
@@ -57,7 +55,7 @@ public class ClientServiceImpl implements ClientService {
         try {
             return clientRepository.findAll();
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            UtilsException.showStackTraceError(e);
             throw UtilsException.createServiceException(e);
         }
     }
@@ -70,7 +68,7 @@ public class ClientServiceImpl implements ClientService {
             clienteEntity = clientRepository.save(client);
             return clienteEntity;
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            UtilsException.showStackTraceError(e);
             throw UtilsException.createServiceException(e);
         }
     }
@@ -83,6 +81,7 @@ public class ClientServiceImpl implements ClientService {
             clientRepository.deleteById(idCliente);
             return clienteEntity;
         } catch (Exception e) {
+            UtilsException.showStackTraceError(e);
             throw UtilsException.createServiceException(e);
         }
     }

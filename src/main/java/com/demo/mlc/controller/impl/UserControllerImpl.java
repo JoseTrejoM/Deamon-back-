@@ -5,17 +5,16 @@
  */
 package com.demo.mlc.controller.impl;
 
-import com.demo.mlc.dto.UserLoginResponse;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
+
 import com.demo.mlc.controller.UserController;
+import com.demo.mlc.dto.UserLoginRequest;
+import com.demo.mlc.dto.UserLoginResponse;
 import com.demo.mlc.entity.UsuarioAccesoEntity;
 import com.demo.mlc.exception.ServiceException;
 import com.demo.mlc.service.UserService;
-import java.util.List;
-import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -24,12 +23,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  *
  * @author greser69
  */
-@Slf4j
 @RestController
 @RequestMapping("/api") //esta sera la raiz de la url, es decir http://127.0.0.1:8080/api/
 @CrossOrigin
@@ -43,7 +44,7 @@ public class UserControllerImpl implements UserController{
     public ResponseEntity<Object> createUser(@RequestBody UsuarioAccesoEntity user) {
         try {
             UsuarioAccesoEntity userNew = userService.createUser(user);
-            return ResponseEntity.status(HttpStatus.OK).body(userNew);
+            return ResponseEntity.status(HttpStatus.CREATED).body(userNew);
         } catch (ServiceException e) {
             return new ResponseEntity<>(e.getCode(), e.getCode().getHttpStatus());
         }
@@ -51,10 +52,9 @@ public class UserControllerImpl implements UserController{
 
     @Override    
     @PostMapping("/user/login")
-    public ResponseEntity<Object> validateUser(@RequestBody UsuarioAccesoEntity user) {
+    public ResponseEntity<Object> validateUser(@RequestBody UserLoginRequest userLogin) {
         try{
-            log.info("Entro a validar usuario" + user);
-         UserLoginResponse userLoginResponse = userService.validateUser(user);
+         UserLoginResponse userLoginResponse = userService.validateUser(userLogin);
         return ResponseEntity.status(HttpStatus.OK).body(userLoginResponse);
         }catch(ServiceException e){
             return new ResponseEntity<>(e.getCode(), e.getCode().getHttpStatus());
@@ -90,7 +90,7 @@ public class UserControllerImpl implements UserController{
 	public ResponseEntity<Object> updateUser(@RequestBody UsuarioAccesoEntity user) {
 		try {
 			UsuarioAccesoEntity userUpdate = userService.updateUser(user);
-            return ResponseEntity.status(HttpStatus.OK).body(userUpdate);
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(userUpdate);
 
         } catch (ServiceException e) {
             return new ResponseEntity<>(e.getCode(), e.getCode().getHttpStatus());
@@ -102,7 +102,7 @@ public class UserControllerImpl implements UserController{
 	public ResponseEntity<Object> deleteUser(@PathVariable Integer idUsuario) {
 		try {
 			UsuarioAccesoEntity userDelete = userService.deleteUser(idUsuario);
-            return ResponseEntity.status(HttpStatus.OK).body(userDelete);
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(userDelete);
 
         } catch (ServiceException e) {
             return new ResponseEntity<>(e.getCode(), e.getCode().getHttpStatus());
