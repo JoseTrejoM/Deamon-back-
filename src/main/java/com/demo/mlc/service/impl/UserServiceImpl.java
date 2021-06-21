@@ -81,6 +81,19 @@ public class UserServiceImpl implements UserService {
     }
     
     @Override
+	public UsuarioAccesoEntity getUserById(Integer idUsuario) throws ServiceException {
+    	try {
+            Optional<UsuarioAccesoEntity> opUser = userRepository.findById(idUsuario);
+            ErrorCode errorCode = new ErrorCode();
+            errorCode.setMessage("Not exists " + idUsuario);
+            return opUser.orElseThrow(() -> new ServiceException(errorCode));           
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw UtilsException.createServiceException(e);
+        }
+	}
+    
+    @Override
     public List<UsuarioAccesoEntity> getUserAll() throws ServiceException {
         try {
             return userRepository.findAll();
@@ -88,5 +101,28 @@ public class UserServiceImpl implements UserService {
             log.error(e.getMessage(), e);
             throw UtilsException.createServiceException(e);
         }
-    }
+    }	
+
+	@Override
+	public UsuarioAccesoEntity updateUser(UsuarioAccesoEntity user) throws ServiceException {
+		UsuarioAccesoEntity userEntity = getUserById(user.getIdUsuario());
+        try {
+            userEntity = userRepository.save(user);
+            return userEntity;
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw UtilsException.createServiceException(e);
+        }
+	}
+
+	@Override
+	public UsuarioAccesoEntity deleteUser(Integer idUsuario) throws ServiceException {
+		UsuarioAccesoEntity userEntity = getUserById(idUsuario);
+        try {
+            userRepository.deleteById(idUsuario);
+            return userEntity;
+        } catch (Exception e) {
+            throw UtilsException.createServiceException(e);
+        }
+	}
 }

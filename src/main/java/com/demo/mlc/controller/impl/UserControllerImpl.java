@@ -19,8 +19,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 
 /**
  *
@@ -59,6 +62,18 @@ public class UserControllerImpl implements UserController{
     }
     
     @Override
+    @GetMapping("/user/byid/{idUsuario}")
+	public ResponseEntity<Object> getUserById(@PathVariable Integer idUsuario) {
+    	try {
+    		UsuarioAccesoEntity userGet = userService.getUserById(idUsuario);
+            return ResponseEntity.status(HttpStatus.OK).body(userGet);
+
+        } catch (ServiceException e) {
+            return new ResponseEntity<>(e.getCode(), e.getCode().getHttpStatus());
+        }
+	}
+    
+    @Override
     @GetMapping("/user/all")
     public ResponseEntity<Object> getUserAll() {
         try {
@@ -68,5 +83,29 @@ public class UserControllerImpl implements UserController{
         } catch (ServiceException e) {
             return new ResponseEntity<>(e.getCode(), e.getCode().getHttpStatus());
         }
-    }
+    }	
+
+	@Override
+	@PutMapping("/user/update")
+	public ResponseEntity<Object> updateUser(@RequestBody UsuarioAccesoEntity user) {
+		try {
+			UsuarioAccesoEntity userUpdate = userService.updateUser(user);
+            return ResponseEntity.status(HttpStatus.OK).body(userUpdate);
+
+        } catch (ServiceException e) {
+            return new ResponseEntity<>(e.getCode(), e.getCode().getHttpStatus());
+        }
+	}
+
+	@Override
+	@DeleteMapping("/user/delete/{idUsuario}")
+	public ResponseEntity<Object> deleteUser(@PathVariable Integer idUsuario) {
+		try {
+			UsuarioAccesoEntity userDelete = userService.deleteUser(idUsuario);
+            return ResponseEntity.status(HttpStatus.OK).body(userDelete);
+
+        } catch (ServiceException e) {
+            return new ResponseEntity<>(e.getCode(), e.getCode().getHttpStatus());
+        }
+	}
 }
