@@ -21,13 +21,13 @@ import lombok.ToString;
 // @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class UserLoginRequest implements UserDetails {
+public class LoginRequestDTO implements UserDetails {
     private UsuarioAccesoEntity usuarioAcceso;
 
     private String username;
     private String password;
 
-    public UserLoginRequest(UsuarioAccesoEntity usuarioAcceso) {
+    public LoginRequestDTO(UsuarioAccesoEntity usuarioAcceso) {
         this.usuarioAcceso = usuarioAcceso;
         this.username = usuarioAcceso.getCorreo();
         this.password = usuarioAcceso.getContrasenia();
@@ -37,9 +37,9 @@ public class UserLoginRequest implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         var listRols = new ArrayList<SimpleGrantedAuthority>();
         var listRolMock = Arrays.asList("API_USER", "API_CUSTOMER");
-        listRolMock.forEach((String rol) -> {
-            listRols.add(new SimpleGrantedAuthority(rol));
-        });
+        listRolMock.forEach((String rol) -> 
+            listRols.add(new SimpleGrantedAuthority(rol))
+        );
         return listRols;
     }
 

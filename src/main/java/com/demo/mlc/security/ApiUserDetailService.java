@@ -2,7 +2,7 @@ package com.demo.mlc.security;
 
 import java.util.Optional;
 
-import com.demo.mlc.dto.UserLoginRequest;
+import com.demo.mlc.dto.LoginRequestDTO;
 import com.demo.mlc.entity.UsuarioAccesoEntity;
 import com.demo.mlc.repository.UserRepository;
 
@@ -22,7 +22,7 @@ public class ApiUserDetailService implements UserDetailsService{
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<UsuarioAccesoEntity> opUsuario = userRepository.findByCorreo(username);        
         var opUser = opUsuario.orElseThrow(() -> new UsernameNotFoundException("Username does not exist"));
-        return new UserLoginRequest(opUser);
+        return new LoginRequestDTO(opUser);
     }
     
 }

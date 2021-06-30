@@ -5,13 +5,19 @@
  */
 package com.demo.mlc.service.impl;
 
-import com.demo.mlc.dto.ErrorCode;
+import com.demo.mlc.dto.CustomerDTO;
+import com.demo.mlc.dto.ErrorCodeDTO;
 import com.demo.mlc.entity.ClienteEntity;
 import com.demo.mlc.exception.ServiceException;
-import com.demo.mlc.exception.utils.UtilsException;
+import com.demo.mlc.exception.utils.UtilsEx;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import com.demo.mlc.repository.ClientRepository;
 import com.demo.mlc.service.ClientService;
@@ -23,66 +29,79 @@ import com.demo.mlc.service.ClientService;
 @Service
 public class ClientServiceImpl implements ClientService {
 
+    private static final ModelMapper modelMapper = new ModelMapper();
+
     @Autowired
     ClientRepository clientRepository;
 
     @Override
-    public ClienteEntity createClient(ClienteEntity client) throws ServiceException {
+    public CustomerDTO createClient(CustomerDTO customer) throws ServiceException {
         try {
-            return clientRepository.save(client);
+            var customerEntity = convertToEntity(customer);
+            return convertToDTO(clientRepository.save(customerEntity));
         } catch (Exception e) {
-            UtilsException.showStackTraceError(e);
-            throw UtilsException.createServiceException(e);
+            UtilsEx.showStackTraceError(e);
+            throw UtilsEx.createServiceException(e);
         }
     }
 
     @Override
-    public ClienteEntity getClientById(Integer idCliente) throws ServiceException {
+    public CustomerDTO getClientById(Integer idCliente) throws ServiceException {
         try {
             Optional<ClienteEntity> opClient = clientRepository.findById(idCliente);
-            ErrorCode errorCode = new ErrorCode();
-            errorCode.setMessage("Not exists customer with idCliente " + idCliente);
-            return opClient.orElseThrow(() -> new ServiceException(errorCode, errorCode.getMessage()));
+            var errorCode = new ErrorCodeDTO();
+            errorCode.setHttpStatus(HttpStatus.NOT_FOUND);
+            errorCode.setMessage(errorCode.getHttpStatus().getReasonPhrase() + " with idCliente "  + idCliente);
+            var customerEntity = opClient.orElseThrow(() -> new ServiceException(errorCode, errorCode.getMessage()));
+            return convertToDTO(customerEntity);
         } catch (Exception e) {
-            UtilsException.showStackTraceError(e);
-            throw UtilsException.createServiceException(e);
+            UtilsEx.showStackTraceError(e);
+            throw UtilsEx.createServiceException(e);
         }
 
     }
 
     @Override
-    public List<ClienteEntity> getClientAll() throws ServiceException {
+    public List<CustomerDTO> getClientAll() throws ServiceException {
         try {
-            return clientRepository.findAll();
+            var list = clientRepository.findAll(Sort.by(Sort.Direction.ASC, "nombre"));
+            return list.stream().map(this :: convertToDTO).collect(Collectors.toList());
         } catch (Exception e) {
-            UtilsException.showStackTraceError(e);
-            throw UtilsException.createServiceException(e);
+            UtilsEx.showStackTraceError(e);
+            throw UtilsEx.createServiceException(e);
         }
     }
 
     @Override
-    public ClienteEntity updateClient(ClienteEntity client) throws ServiceException {
+    public CustomerDTO updateClient(CustomerDTO customer) throws ServiceException {
 
-        ClienteEntity clienteEntity = getClientById(client.getIdCliente());
+        getClientById(customer.getIdCliente());
         try {
-            clienteEntity = clientRepository.save(client);
-            return clienteEntity;
+            return createClient(customer);
         } catch (Exception e) {
-            UtilsException.showStackTraceError(e);
-            throw UtilsException.createServiceException(e);
+            UtilsEx.showStackTraceError(e);
+            throw UtilsEx.createServiceException(e);
         }
     }
 
     @Override
-    public ClienteEntity deleteClient(Integer idCliente) throws ServiceException {
+    public CustomerDTO deleteClient(Integer idCliente) throws ServiceException {
 
-        ClienteEntity clienteEntity = getClientById(idCliente);
+        var customerDTO = getClientById(idCliente);
         try {
             clientRepository.deleteById(idCliente);
-            return clienteEntity;
+            return customerDTO;
         } catch (Exception e) {
-            UtilsException.showStackTraceError(e);
-            throw UtilsException.createServiceException(e);
+            UtilsEx.showStackTraceError(e);
+            throw UtilsEx.createServiceException(e);
         }
+    }
+
+    private ClienteEntity convertToEntity(CustomerDTO customerDTO){
+        return modelMapper.map(customerDTO, ClienteEntity.class);
+    }
+
+    private CustomerDTO convertToDTO(ClienteEntity customerEntity){
+        return modelMapper.map(customerEntity, CustomerDTO.class);
     }
 }

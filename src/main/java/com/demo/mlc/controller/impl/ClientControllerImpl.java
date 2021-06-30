@@ -5,23 +5,23 @@
  */
 package com.demo.mlc.controller.impl;
 
-import com.demo.mlc.entity.ClienteEntity;
-import java.util.List;
+import com.demo.mlc.controller.ClientController;
+import com.demo.mlc.dto.CustomerDTO;
+import com.demo.mlc.exception.ServiceException;
+import com.demo.mlc.service.ClientService;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.demo.mlc.controller.ClientController;
-import com.demo.mlc.exception.ServiceException;
-import com.demo.mlc.service.ClientService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PathVariable;
 
 /**
  *
@@ -37,9 +37,9 @@ public class ClientControllerImpl implements ClientController {
 
     @Override
     @PostMapping("/client/create")
-    public ResponseEntity<Object> createClient(@RequestBody ClienteEntity client) {
+    public ResponseEntity<Object> createClient(@RequestBody CustomerDTO customer) {
         try {
-            ClienteEntity clientNew = clientService.createClient(client);
+            var clientNew = clientService.createClient(customer);
             return ResponseEntity.status(HttpStatus.OK).body(clientNew);
         } catch (ServiceException e) {
             return new ResponseEntity<>(e.getCode(), e.getCode().getHttpStatus());
@@ -50,7 +50,7 @@ public class ClientControllerImpl implements ClientController {
     @GetMapping("/client/byid/{idCliente}")
     public ResponseEntity<Object> getClientById(@PathVariable Integer idCliente) {
         try {
-            ClienteEntity clientGet = clientService.getClientById(idCliente);
+            var clientGet = clientService.getClientById(idCliente);
             return ResponseEntity.status(HttpStatus.OK).body(clientGet);
 
         } catch (ServiceException e) {
@@ -62,7 +62,7 @@ public class ClientControllerImpl implements ClientController {
     @GetMapping("/client/all")
     public ResponseEntity<Object> getClientAll() {
         try {
-            List<ClienteEntity> listClient = clientService.getClientAll();
+            var listClient = clientService.getClientAll();
             return ResponseEntity.status(HttpStatus.OK).body(listClient);
 
         } catch (ServiceException e) {
@@ -72,9 +72,9 @@ public class ClientControllerImpl implements ClientController {
 
     @Override
     @PutMapping("/client/update")
-    public ResponseEntity<Object> updateClient(@RequestBody ClienteEntity client) {
+    public ResponseEntity<Object> updateClient(@RequestBody CustomerDTO customer) {
         try {
-            ClienteEntity clientUpdate = clientService.updateClient(client);
+            var clientUpdate = clientService.updateClient(customer);
             return ResponseEntity.status(HttpStatus.OK).body(clientUpdate);
 
         } catch (ServiceException e) {
@@ -86,7 +86,7 @@ public class ClientControllerImpl implements ClientController {
     @DeleteMapping("/client/delete/{idCliente}")
     public ResponseEntity<Object> deleteClient(@PathVariable Integer idCliente) {
         try {
-            ClienteEntity clientDelete =  clientService.deleteClient(idCliente);
+            var clientDelete =  clientService.deleteClient(idCliente);
             return ResponseEntity.status(HttpStatus.OK).body(clientDelete);
 
         } catch (ServiceException e) {

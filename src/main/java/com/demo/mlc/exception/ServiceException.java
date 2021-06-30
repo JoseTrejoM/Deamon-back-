@@ -5,7 +5,7 @@
  */
 package com.demo.mlc.exception;
 
-import com.demo.mlc.dto.ErrorCode;
+import com.demo.mlc.dto.ErrorCodeDTO;
 
 /**
  *
@@ -13,29 +13,29 @@ import com.demo.mlc.dto.ErrorCode;
  */
 public class ServiceException extends Exception {
 
-    private final ErrorCode code;
+    private final ErrorCodeDTO code;
 
-    public ServiceException(ErrorCode code) {
+    public ServiceException(ErrorCodeDTO code) {
         super();
         this.code = code;
     }
 
-    public ServiceException(ErrorCode code, String message) {
+    public ServiceException(ErrorCodeDTO code, String message) {
         super(message);
         this.code = code;
     }
 
-    public ServiceException(ErrorCode code, Throwable cause) {
+    public ServiceException(ErrorCodeDTO code, Throwable cause) {
         super(cause);
         this.code = code;
     }
     
-    public ServiceException(ErrorCode code, String message, Throwable cause) {
+    public ServiceException(ErrorCodeDTO code, String message, Throwable cause) {
         super(message, cause);
         this.code = code;
     }
 
-    public ErrorCode getCode() {
+    public ErrorCodeDTO getCode() {
         return this.code;
     }
 }

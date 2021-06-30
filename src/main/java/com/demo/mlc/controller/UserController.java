@@ -5,8 +5,7 @@
  */
 package com.demo.mlc.controller;
 
-import com.demo.mlc.dto.UserLoginRequest;
-import com.demo.mlc.entity.UsuarioAccesoEntity;
+import com.demo.mlc.dto.UserDTO;
 import org.springframework.http.ResponseEntity;
 
 /**
@@ -15,15 +14,13 @@ import org.springframework.http.ResponseEntity;
  */
 public interface UserController {
 
-	ResponseEntity<Object> createUser(UsuarioAccesoEntity user);
-
-	ResponseEntity<Object> validateUser(UserLoginRequest userLogin);
+	ResponseEntity<Object> createUser(UserDTO user);
 	
 	ResponseEntity<Object> getUserById (Integer idUsuario);
 
 	ResponseEntity<Object> getUserAll();
 
-	ResponseEntity<Object> updateUser(UsuarioAccesoEntity user);
+	ResponseEntity<Object> updateUser(UserDTO user);
 
 	ResponseEntity<Object> deleteUser(Integer idUsuario);
 }

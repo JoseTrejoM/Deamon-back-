@@ -5,12 +5,8 @@
  */
 package com.demo.mlc.controller.impl;
 
-import java.util.List;
-
 import com.demo.mlc.controller.UserController;
-import com.demo.mlc.dto.UserLoginRequest;
-import com.demo.mlc.dto.UserLoginResponse;
-import com.demo.mlc.entity.UsuarioAccesoEntity;
+import com.demo.mlc.dto.UserDTO;
 import com.demo.mlc.exception.ServiceException;
 import com.demo.mlc.service.UserService;
 
@@ -41,31 +37,20 @@ public class UserControllerImpl implements UserController{
     
     @Override
     @PostMapping("/user/create")
-    public ResponseEntity<Object> createUser(@RequestBody UsuarioAccesoEntity user) {
+    public ResponseEntity<Object> createUser(@RequestBody UserDTO user) {
         try {
-            UsuarioAccesoEntity userNew = userService.createUser(user);
+            var userNew = userService.createUser(user);
             return ResponseEntity.status(HttpStatus.CREATED).body(userNew);
         } catch (ServiceException e) {
             return new ResponseEntity<>(e.getCode(), e.getCode().getHttpStatus());
         }
     }
-
-    @Override    
-    @PostMapping("/user/login")
-    public ResponseEntity<Object> validateUser(@RequestBody UserLoginRequest userLogin) {
-        try{
-         UserLoginResponse userLoginResponse = userService.validateUser(userLogin);
-        return ResponseEntity.status(HttpStatus.OK).body(userLoginResponse);
-        }catch(ServiceException e){
-            return new ResponseEntity<>(e.getCode(), e.getCode().getHttpStatus());
-        }
-    }
-    
+       
     @Override
     @GetMapping("/user/byid/{idUsuario}")
 	public ResponseEntity<Object> getUserById(@PathVariable Integer idUsuario) {
     	try {
-    		UsuarioAccesoEntity userGet = userService.getUserById(idUsuario);
+    		var userGet = userService.getUserById(idUsuario);
             return ResponseEntity.status(HttpStatus.OK).body(userGet);
 
         } catch (ServiceException e) {
@@ -77,7 +62,7 @@ public class UserControllerImpl implements UserController{
     @GetMapping("/user/all")
     public ResponseEntity<Object> getUserAll() {
         try {
-            List<UsuarioAccesoEntity> listClient = userService.getUserAll();
+            var listClient = userService.getUserAll();
             return ResponseEntity.status(HttpStatus.OK).body(listClient);
 
         } catch (ServiceException e) {
@@ -87,9 +72,9 @@ public class UserControllerImpl implements UserController{
 
 	@Override
 	@PutMapping("/user/update")
-	public ResponseEntity<Object> updateUser(@RequestBody UsuarioAccesoEntity user) {
+	public ResponseEntity<Object> updateUser(@RequestBody UserDTO user) {
 		try {
-			UsuarioAccesoEntity userUpdate = userService.updateUser(user);
+			var userUpdate = userService.updateUser(user);
             return ResponseEntity.status(HttpStatus.ACCEPTED).body(userUpdate);
 
         } catch (ServiceException e) {
@@ -101,7 +86,7 @@ public class UserControllerImpl implements UserController{
 	@DeleteMapping("/user/delete/{idUsuario}")
 	public ResponseEntity<Object> deleteUser(@PathVariable Integer idUsuario) {
 		try {
-			UsuarioAccesoEntity userDelete = userService.deleteUser(idUsuario);
+			var userDelete = userService.deleteUser(idUsuario);
             return ResponseEntity.status(HttpStatus.ACCEPTED).body(userDelete);
 
         } catch (ServiceException e) {
