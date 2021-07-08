@@ -10,8 +10,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.demo.mlc.dto.ErrorCodeDTO;
-import com.demo.mlc.dto.UserDTO;
-import com.demo.mlc.entity.UsuarioAccesoEntity;
+import com.demo.mlc.dto.UsuarioDTO;
+import com.demo.mlc.entity.UsuarioEntity;
 import com.demo.mlc.exception.ServiceException;
 import com.demo.mlc.exception.utils.UtilsEx;
 import com.demo.mlc.repository.UserRepository;
@@ -30,16 +30,15 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class UserServiceImpl implements UserService {
-
     private static final ModelMapper modelMapper = new ModelMapper();
 
     @Autowired
     private UserRepository userRepository;
 
     @Override
-    public UserDTO createUser(UserDTO user) throws ServiceException {
+    public UsuarioDTO createUser(UsuarioDTO user) throws ServiceException {
         try {            
-            Optional<UsuarioAccesoEntity> opUsuario = userRepository.findByCorreo(user.getCorreo());
+            Optional<UsuarioEntity> opUsuario = userRepository.findByUsuario(user.getUsuario());
 
             if (opUsuario.isPresent()) {
                 var errorCode = new ErrorCodeDTO();
@@ -47,10 +46,11 @@ public class UserServiceImpl implements UserService {
                 errorCode.setMessage(errorCode.getHttpStatus().getReasonPhrase());
                 throw new ServiceException(errorCode, errorCode.getMessage());
             }
-            String passBCrypt = BCrypt.hashpw(user.getContrasenia(), BCrypt.gensalt());
-            var userEntity = convertToEntity(user);
-            userEntity.setContrasenia(passBCrypt);
-            return convertToDTO(userRepository.save(userEntity));
+            user.setContrasena(user.getUsuario() + user.getContrasena());
+            String passBCrypt = BCrypt.hashpw(user.getContrasena(), BCrypt.gensalt());
+            var userEntity = modelMapper.map(user, UsuarioEntity.class);
+            userEntity.setContrasena(passBCrypt);
+            return modelMapper.map(userRepository.save(userEntity), UsuarioDTO.class);
         } catch (Exception e) {
             UtilsEx.showStackTraceError(e);
             throw UtilsEx.createServiceException(e);
@@ -58,14 +58,15 @@ public class UserServiceImpl implements UserService {
     }    
     
     @Override
-	public UserDTO getUserById(Integer idUsuario) throws ServiceException {
+	public UsuarioDTO getUserById(Integer idUsuario) throws ServiceException {
     	try {
-            Optional<UsuarioAccesoEntity> opUser = userRepository.findById(idUsuario);
+            Optional<UsuarioEntity> opUser = userRepository.findById(idUsuario);
             var errorCode = new ErrorCodeDTO();
             errorCode.setHttpStatus(HttpStatus.NOT_FOUND);
             errorCode.setMessage(errorCode.getHttpStatus().getReasonPhrase() + " with idUsuario "  + idUsuario);
             var userEntity = opUser.orElseThrow(() -> new ServiceException(errorCode, errorCode.getMessage()));
-            return convertToDTO(userEntity);
+
+            return modelMapper.map(userEntity, UsuarioDTO.class);
         } catch (Exception e) {
             UtilsEx.showStackTraceError(e);
             throw UtilsEx.createServiceException(e);
@@ -73,10 +74,10 @@ public class UserServiceImpl implements UserService {
 	}
     
     @Override
-    public List<UserDTO> getUserAll() throws ServiceException {
+    public List<UsuarioDTO> getUserAll() throws ServiceException {
         try {
-            var list = userRepository.findAll(Sort.by(Sort.Direction.ASC, "correo"));            
-            return list.stream().map(this :: convertToDTO).collect(Collectors.toList());
+            var list = userRepository.findAll(Sort.by(Sort.Direction.ASC, "usuario"));
+            return list.stream().map(element -> modelMapper.map(element, UsuarioDTO.class)).collect(Collectors.toList());
         } catch (Exception e) {
             UtilsEx.showStackTraceError(e);
             throw UtilsEx.createServiceException(e);
@@ -84,15 +85,16 @@ public class UserServiceImpl implements UserService {
     }	
 
 	@Override
-	public UserDTO updateUser(UserDTO user) throws ServiceException {
-		var userDTO = getUserById(user.getIdUsuario());
+	public UsuarioDTO updateUser(UsuarioDTO user) throws ServiceException {
+		var userDTO = getUserById(user.getUsuarioId());
         try {
-            if(!userDTO.getContrasenia().equals(user.getContrasenia())){
-                String passBCrypt = BCrypt.hashpw(user.getContrasenia(), BCrypt.gensalt());
-                user.setContrasenia(passBCrypt);
+            if(!userDTO.getContrasena().equals(user.getContrasena())){
+                user.setContrasena(user.getUsuario() + user.getContrasena());
+                String passBCrypt = BCrypt.hashpw(user.getContrasena(), BCrypt.gensalt());
+                user.setContrasena(passBCrypt);
             }
-            var userEntity = convertToEntity(user);
-            return convertToDTO(userRepository.save(userEntity));
+            var userEntity = modelMapper.map(user, UsuarioEntity.class);
+            return modelMapper.map(userRepository.save(userEntity), UsuarioDTO.class);
         } catch (Exception e) {
             UtilsEx.showStackTraceError(e);
             throw UtilsEx.createServiceException(e);
@@ -100,7 +102,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public UserDTO deleteUser(Integer idUsuario) throws ServiceException {
+	public UsuarioDTO deleteUser(Integer idUsuario) throws ServiceException {
 		var userDTO = getUserById(idUsuario);
         try {
             userRepository.deleteById(idUsuario);
@@ -111,11 +113,4 @@ public class UserServiceImpl implements UserService {
         }
 	}
 
-    private UsuarioAccesoEntity convertToEntity(UserDTO userDTO){
-        return modelMapper.map(userDTO, UsuarioAccesoEntity.class);
-    }
-
-    private UserDTO convertToDTO(UsuarioAccesoEntity userEntity){
-        return modelMapper.map(userEntity, UserDTO.class);
-    }
 }

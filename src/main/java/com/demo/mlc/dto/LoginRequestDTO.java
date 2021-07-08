@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
-import com.demo.mlc.entity.UsuarioAccesoEntity;
+import com.demo.mlc.entity.UsuarioEntity;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import org.springframework.security.core.GrantedAuthority;
@@ -22,15 +22,15 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 public class LoginRequestDTO implements UserDetails {
-    private UsuarioAccesoEntity usuarioAcceso;
+    private UsuarioEntity usuarioAcceso;
 
     private String username;
     private String password;
 
-    public LoginRequestDTO(UsuarioAccesoEntity usuarioAcceso) {
+    public LoginRequestDTO(UsuarioEntity usuarioAcceso) {
         this.usuarioAcceso = usuarioAcceso;
-        this.username = usuarioAcceso.getCorreo();
-        this.password = usuarioAcceso.getContrasenia();
+        this.username = usuarioAcceso.getUsuario();
+        this.password = usuarioAcceso.getContrasena();
     }
 
     @Override

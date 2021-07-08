@@ -8,9 +8,11 @@ import lombok.ToString;
 @Data
 @ToString
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class UserDTO {
-    private Integer idUsuario;
-    private String correo;
-    private String contrasenia;
-    private String tipo;
+public class ModuloDTO {
+
+    private Integer sisModId;    
+    private String nombre;
+    private String url;
+    private String imagen;
+
 }

@@ -3,7 +3,7 @@ package com.demo.mlc.security;
 import java.util.Optional;
 
 import com.demo.mlc.dto.LoginRequestDTO;
-import com.demo.mlc.entity.UsuarioAccesoEntity;
+import com.demo.mlc.entity.UsuarioEntity;
 import com.demo.mlc.repository.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,7 @@ public class ApiUserDetailService implements UserDetailsService{
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<UsuarioAccesoEntity> opUsuario = userRepository.findByCorreo(username);        
+        Optional<UsuarioEntity> opUsuario = userRepository.findByUsuario(username);        
         var opUser = opUsuario.orElseThrow(() -> new UsernameNotFoundException("Username does not exist"));
         return new LoginRequestDTO(opUser);
     }

@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthControllerImpl implements AuthController {
 
     @Autowired
-    AuthService authService;
+    private AuthService authService;
 
     @Override
     @PostMapping("/auth/login")
@@ -28,6 +30,28 @@ public class AuthControllerImpl implements AuthController {
         try {
             var userLoginResponse = authService.validateUser(userLogin);
             return ResponseEntity.status(HttpStatus.OK).body(userLoginResponse);
+        } catch (ServiceException e) {
+            return new ResponseEntity<>(e.getCode(), e.getCode().getHttpStatus());
+        }
+    }
+
+    @Override
+    @GetMapping("/auth/modules/{idSistemaPadre}/{idUsuario}")
+    public ResponseEntity<Object> modulesUser(@PathVariable Integer idSistemaPadre, @PathVariable Integer idUsuario) {
+        try {
+            var modulesGet = authService.modulesUser(idSistemaPadre, idUsuario);
+            return ResponseEntity.status(HttpStatus.OK).body(modulesGet);
+        } catch (ServiceException e) {
+            return new ResponseEntity<>(e.getCode(), e.getCode().getHttpStatus());
+        }
+    }
+
+    @Override
+    @GetMapping("/auth/permission/{idSistema}/{idUsuario}")
+    public ResponseEntity<Object> permissionUser(@PathVariable Integer idSistema, @PathVariable Integer idUsuario) {
+        try {
+            var permissionsGet = authService.permissionUser(idSistema, idUsuario);
+            return ResponseEntity.status(HttpStatus.OK).body(permissionsGet);
         } catch (ServiceException e) {
             return new ResponseEntity<>(e.getCode(), e.getCode().getHttpStatus());
         }

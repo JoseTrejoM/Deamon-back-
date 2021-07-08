@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.demo.mlc.dto.LoginRequestDTO;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
@@ -23,6 +24,7 @@ public class JwtService {
     private int expirationTime;
 
     public String createToken(UserDetails userDetails) {
+        var loginRequestDTO = (LoginRequestDTO) userDetails;
         String username = userDetails.getUsername();
         Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
         List<String> listAuthorities = authorities.stream().map(GrantedAuthority :: getAuthority).collect(Collectors.toList());
@@ -31,7 +33,7 @@ public class JwtService {
         cal.add(Calendar.MILLISECOND, expirationTime);
 
         return JWT.create().withSubject(username).withClaim(JwtConstants.AUTHORITIES, listAuthorities)
-                .withIssuer(username).withExpiresAt(cal.getTime()).sign(getAlgorithm());
+                .withIssuer(loginRequestDTO.getUsuarioAcceso().getUsuarioId().toString()).withExpiresAt(cal.getTime()).sign(getAlgorithm());
     }    
 
     public boolean validateToken(String token, UserDetails userDetails) {

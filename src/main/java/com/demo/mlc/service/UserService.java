@@ -7,7 +7,7 @@ package com.demo.mlc.service;
 
 import java.util.List;
 
-import com.demo.mlc.dto.UserDTO;
+import com.demo.mlc.dto.UsuarioDTO;
 import com.demo.mlc.exception.ServiceException;
 
 /**
@@ -17,13 +17,13 @@ import com.demo.mlc.exception.ServiceException;
 
 public interface UserService {
     
-    UserDTO createUser(UserDTO user) throws ServiceException;         
+    UsuarioDTO createUser(UsuarioDTO user) throws ServiceException;         
     
-    UserDTO getUserById(Integer idUsuario) throws ServiceException;
+    UsuarioDTO getUserById(Integer idUsuario) throws ServiceException;
     
-    List<UserDTO> getUserAll() throws ServiceException;
+    List<UsuarioDTO> getUserAll() throws ServiceException;
     
-    UserDTO updateUser(UserDTO user) throws ServiceException;
+    UsuarioDTO updateUser(UsuarioDTO user) throws ServiceException;
 
-    UserDTO deleteUser(Integer idUsuario) throws ServiceException;
+    UsuarioDTO deleteUser(Integer idUsuario) throws ServiceException;
 }

@@ -6,7 +6,7 @@
 package com.demo.mlc.controller.impl;
 
 import com.demo.mlc.controller.UserController;
-import com.demo.mlc.dto.UserDTO;
+import com.demo.mlc.dto.UsuarioDTO;
 import com.demo.mlc.exception.ServiceException;
 import com.demo.mlc.service.UserService;
 
@@ -37,7 +37,7 @@ public class UserControllerImpl implements UserController{
     
     @Override
     @PostMapping("/user/create")
-    public ResponseEntity<Object> createUser(@RequestBody UserDTO user) {
+    public ResponseEntity<Object> createUser(@RequestBody UsuarioDTO user) {
         try {
             var userNew = userService.createUser(user);
             return ResponseEntity.status(HttpStatus.CREATED).body(userNew);
@@ -72,7 +72,7 @@ public class UserControllerImpl implements UserController{
 
 	@Override
 	@PutMapping("/user/update")
-	public ResponseEntity<Object> updateUser(@RequestBody UserDTO user) {
+	public ResponseEntity<Object> updateUser(@RequestBody UsuarioDTO user) {
 		try {
 			var userUpdate = userService.updateUser(user);
             return ResponseEntity.status(HttpStatus.ACCEPTED).body(userUpdate);
