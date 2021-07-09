@@ -21,6 +21,9 @@ public class ModuloEntity implements Serializable{
     @Column(name="SISMODPADREID")
     private Integer sisModPadreId;
 
+    @Column(name="ORDEN")
+    private Integer order;
+
     @Column(name="USUARIOID")
     private Integer usuarioId;
 

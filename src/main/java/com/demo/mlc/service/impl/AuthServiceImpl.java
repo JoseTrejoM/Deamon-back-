@@ -71,6 +71,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public List<ModuloDTO> modulesUser(Integer idSistemaPadre, Integer idUsuario) throws ServiceException {
         var listModules = moduleRepository.findBySisModPadreIdAndUsuarioId(idSistemaPadre, idUsuario);
+        listModules.sort((a, b) -> Integer.compare(a.getOrder(), b.getOrder()));
         return listModules.stream().map(element -> modelMapper.map(element, ModuloDTO.class))
                 .collect(Collectors.toList());
     }
