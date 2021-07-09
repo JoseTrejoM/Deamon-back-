@@ -5,10 +5,10 @@
  */
 package com.demo.mlc.service;
 
-import com.demo.mlc.dto.UserLoginResponse;
-import com.demo.mlc.entity.UsuarioAccesoEntity;
-import com.demo.mlc.exception.ServiceException;
 import java.util.List;
+
+import com.demo.mlc.dto.UsuarioDTO;
+import com.demo.mlc.exception.ServiceException;
 
 /**
  *
@@ -17,15 +17,13 @@ import java.util.List;
 
 public interface UserService {
     
-    UsuarioAccesoEntity createUser(UsuarioAccesoEntity user) throws ServiceException;
-     
-    UserLoginResponse validateUser(UsuarioAccesoEntity user) throws ServiceException;
+    UsuarioDTO createUser(UsuarioDTO user) throws ServiceException;         
     
-    UsuarioAccesoEntity getUserById(Integer idUsuario) throws ServiceException;
+    UsuarioDTO getUserById(Integer idUsuario) throws ServiceException;
     
-    List<UsuarioAccesoEntity> getUserAll() throws ServiceException;
+    List<UsuarioDTO> getUserAll() throws ServiceException;
     
-    UsuarioAccesoEntity updateUser(UsuarioAccesoEntity user) throws ServiceException;
+    UsuarioDTO updateUser(UsuarioDTO user) throws ServiceException;
 
-    UsuarioAccesoEntity deleteUser(Integer idUsuario) throws ServiceException;
+    UsuarioDTO deleteUser(Integer idUsuario) throws ServiceException;
 }

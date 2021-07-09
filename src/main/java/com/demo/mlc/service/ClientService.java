@@ -5,7 +5,7 @@
  */
 package com.demo.mlc.service;
 
-import com.demo.mlc.entity.ClienteEntity;
+import com.demo.mlc.dto.CustomerDTO;
 import com.demo.mlc.exception.ServiceException;
 import java.util.List;
 
@@ -15,13 +15,13 @@ import java.util.List;
  */
 public interface ClientService {
 
-    ClienteEntity createClient(ClienteEntity client) throws ServiceException;
+    CustomerDTO createClient(CustomerDTO customer) throws ServiceException;
 
-    ClienteEntity getClientById(Integer idCliente) throws ServiceException;
+    CustomerDTO getClientById(Integer idCliente) throws ServiceException;
 
-    List<ClienteEntity> getClientAll() throws ServiceException;
+    List<CustomerDTO> getClientAll() throws ServiceException;
 
-    ClienteEntity updateClient(ClienteEntity client) throws ServiceException;
+    CustomerDTO updateClient(CustomerDTO customer) throws ServiceException;
 
-    ClienteEntity deleteClient(Integer idCliente) throws ServiceException;
+    CustomerDTO deleteClient(Integer idCliente) throws ServiceException;
 }

@@ -5,7 +5,6 @@
  */
 package com.demo.mlc.entity;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Column;
@@ -15,16 +14,12 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import lombok.Data;
-import lombok.ToString;
 
 /**
  *
  * @author greser69
  */
 @Data
-@ToString
-@JsonInclude(JsonInclude.Include.NON_NULL)
-
 @Entity
 @Table(name = "CLIENTE")
 public class ClienteEntity implements Serializable {

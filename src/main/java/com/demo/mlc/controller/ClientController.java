@@ -5,7 +5,7 @@
  */
 package com.demo.mlc.controller;
 
-import com.demo.mlc.entity.ClienteEntity;
+import com.demo.mlc.dto.CustomerDTO;
 import org.springframework.http.ResponseEntity;
 
 /**
@@ -14,13 +14,13 @@ import org.springframework.http.ResponseEntity;
  */
 public interface ClientController {
     
-    ResponseEntity<Object> createClient(ClienteEntity client);
+    ResponseEntity<Object> createClient(CustomerDTO customer);
     
     ResponseEntity<Object> getClientById (Integer idCliente);
     
     ResponseEntity<Object> getClientAll();       
     
-    ResponseEntity<Object> updateClient(ClienteEntity client);
+    ResponseEntity<Object> updateClient(CustomerDTO customer);
     
     ResponseEntity<Object> deleteClient(Integer idCliente);
 }

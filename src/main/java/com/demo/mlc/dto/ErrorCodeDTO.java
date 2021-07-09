@@ -5,9 +5,11 @@
  */
 package com.demo.mlc.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serializable;
 import lombok.Data;
+import org.springframework.http.HttpStatus;
 
 /**
  *
@@ -15,11 +17,10 @@ import lombok.Data;
  */
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class UserLoginResponse implements Serializable {
-        
-    private String user;
-    private String idlocal;
-    private String refreshToken;    
-    private Long expiresIn;
-    private String idToken;
+public class ErrorCodeDTO implements Serializable {
+
+    @JsonIgnore
+    private HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+    private String codeError;
+    private String message;
 }

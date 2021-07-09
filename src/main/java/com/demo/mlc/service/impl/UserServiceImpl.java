@@ -5,124 +5,112 @@
  */
 package com.demo.mlc.service.impl;
 
-import com.demo.mlc.dto.ErrorCode;
-import com.demo.mlc.dto.UserLoginResponse;
-import com.demo.mlc.entity.UsuarioAccesoEntity;
-import com.demo.mlc.exception.ServiceException;
-import com.demo.mlc.exception.utils.UtilsException;
+import java.util.List;
 import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import java.util.stream.Collectors;
+
+import com.demo.mlc.dto.ErrorCodeDTO;
+import com.demo.mlc.dto.UsuarioDTO;
+import com.demo.mlc.entity.UsuarioEntity;
+import com.demo.mlc.exception.ServiceException;
+import com.demo.mlc.exception.utils.UtilsEx;
 import com.demo.mlc.repository.UserRepository;
 import com.demo.mlc.service.UserService;
-import java.util.Base64;
-import java.util.List;
-import lombok.extern.slf4j.Slf4j;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.stereotype.Service;
 
 /**
  *
  * @author greser69
  */
-@Slf4j
 @Service
 public class UserServiceImpl implements UserService {
+    private static final ModelMapper modelMapper = new ModelMapper();
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     @Override
-    public UsuarioAccesoEntity createUser(UsuarioAccesoEntity user) throws ServiceException {
-        try {
-            Optional<UsuarioAccesoEntity> opUsuario = userRepository.findByCorreo(user.getCorreo());
+    public UsuarioDTO createUser(UsuarioDTO user) throws ServiceException {
+        try {            
+            Optional<UsuarioEntity> opUsuario = userRepository.findByUsuario(user.getUsuario());
 
             if (opUsuario.isPresent()) {
-                ErrorCode errorCode = new ErrorCode();
-                errorCode.setMessage("User exists");
-                throw new ServiceException(errorCode);
-            }
-            return userRepository.save(user);
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            throw UtilsException.createServiceException(e);
-        }
-    }
-
-    @Override
-    public UserLoginResponse validateUser(UsuarioAccesoEntity user) throws ServiceException {
-        try {
-            Optional<UsuarioAccesoEntity> opUsuario = userRepository.findByCorreo(user.getCorreo());
-            final UserLoginResponse loginResponse = new UserLoginResponse();
-
-            opUsuario.ifPresent((opUser) -> {
-                if (opUser != null && opUser.getCorreo().equalsIgnoreCase(user.getCorreo()) && opUser.getContrasenia().equals(user.getContrasenia())) {
-                    loginResponse.setUser(opUser.getCorreo());
-
-                    //30minutos = 1_800_000 milisegundos
-                    long timeSesion = 1_800_000l;
-                    long timeInMillis = System.currentTimeMillis() + timeSesion;
-                    loginResponse.setExpiresIn(timeInMillis);
-
-                    String src = opUser.getCorreo() + timeInMillis;
-                    String token = Base64.getEncoder().encodeToString(src.getBytes());
-                    loginResponse.setIdToken(token);
-                }
-            });
-
-            if (loginResponse.getIdToken() == null) {
-                ErrorCode errorCode = new ErrorCode();
-                errorCode.setMessage("Access denied");
+                var errorCode = new ErrorCodeDTO();
+                errorCode.setHttpStatus(HttpStatus.NOT_ACCEPTABLE);
+                errorCode.setMessage(errorCode.getHttpStatus().getReasonPhrase());
                 throw new ServiceException(errorCode, errorCode.getMessage());
             }
-            return loginResponse;
+            user.setContrasena(user.getUsuario() + user.getContrasena());
+            String passBCrypt = BCrypt.hashpw(user.getContrasena(), BCrypt.gensalt());
+            var userEntity = modelMapper.map(user, UsuarioEntity.class);
+            userEntity.setContrasena(passBCrypt);
+            return modelMapper.map(userRepository.save(userEntity), UsuarioDTO.class);
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            throw UtilsException.createServiceException(e);
+            UtilsEx.showStackTraceError(e);
+            throw UtilsEx.createServiceException(e);
         }
-    }
+    }    
     
     @Override
-	public UsuarioAccesoEntity getUserById(Integer idUsuario) throws ServiceException {
+	public UsuarioDTO getUserById(Integer idUsuario) throws ServiceException {
     	try {
-            Optional<UsuarioAccesoEntity> opUser = userRepository.findById(idUsuario);
-            ErrorCode errorCode = new ErrorCode();
-            errorCode.setMessage("Not exists " + idUsuario);
-            return opUser.orElseThrow(() -> new ServiceException(errorCode));           
+            Optional<UsuarioEntity> opUser = userRepository.findById(idUsuario);
+            var errorCode = new ErrorCodeDTO();
+            errorCode.setHttpStatus(HttpStatus.NOT_FOUND);
+            errorCode.setMessage(errorCode.getHttpStatus().getReasonPhrase() + " with idUsuario "  + idUsuario);
+            var userEntity = opUser.orElseThrow(() -> new ServiceException(errorCode, errorCode.getMessage()));
+
+            return modelMapper.map(userEntity, UsuarioDTO.class);
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            throw UtilsException.createServiceException(e);
+            UtilsEx.showStackTraceError(e);
+            throw UtilsEx.createServiceException(e);
         }
 	}
     
     @Override
-    public List<UsuarioAccesoEntity> getUserAll() throws ServiceException {
+    public List<UsuarioDTO> getUserAll() throws ServiceException {
         try {
-            return userRepository.findAll();
+            var list = userRepository.findAll(Sort.by(Sort.Direction.ASC, "usuario"));
+            return list.stream().map(element -> modelMapper.map(element, UsuarioDTO.class)).collect(Collectors.toList());
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            throw UtilsException.createServiceException(e);
+            UtilsEx.showStackTraceError(e);
+            throw UtilsEx.createServiceException(e);
         }
     }	
 
 	@Override
-	public UsuarioAccesoEntity updateUser(UsuarioAccesoEntity user) throws ServiceException {
-		UsuarioAccesoEntity userEntity = getUserById(user.getIdUsuario());
+	public UsuarioDTO updateUser(UsuarioDTO user) throws ServiceException {
+		var userDTO = getUserById(user.getUsuarioId());
         try {
-            userEntity = userRepository.save(user);
-            return userEntity;
+            if(!userDTO.getContrasena().equals(user.getContrasena())){
+                user.setContrasena(user.getUsuario() + user.getContrasena());
+                String passBCrypt = BCrypt.hashpw(user.getContrasena(), BCrypt.gensalt());
+                user.setContrasena(passBCrypt);
+            }
+            var userEntity = modelMapper.map(user, UsuarioEntity.class);
+            return modelMapper.map(userRepository.save(userEntity), UsuarioDTO.class);
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            throw UtilsException.createServiceException(e);
+            UtilsEx.showStackTraceError(e);
+            throw UtilsEx.createServiceException(e);
         }
 	}
 
 	@Override
-	public UsuarioAccesoEntity deleteUser(Integer idUsuario) throws ServiceException {
-		UsuarioAccesoEntity userEntity = getUserById(idUsuario);
+	public UsuarioDTO deleteUser(Integer idUsuario) throws ServiceException {
+		var userDTO = getUserById(idUsuario);
         try {
             userRepository.deleteById(idUsuario);
-            return userEntity;
+            return userDTO;
         } catch (Exception e) {
-            throw UtilsException.createServiceException(e);
+            UtilsEx.showStackTraceError(e);
+            throw UtilsEx.createServiceException(e);
         }
 	}
+
 }
